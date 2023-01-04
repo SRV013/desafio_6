@@ -1,0 +1,43 @@
+{
+  "name": "trabajofinal",
+  "version": "1.0.0",
+  "repository": "git@github.com:SRV013/desafioseis.git",
+  "author": "srv013 <srv013@gmail.com>",
+  "scripts": {
+    "dev:front": "parcel serve ./frontend/index.html",
+    "dev:api": "nodemon ./backend/index.ts",
+    "build:front": "parcel build './frontend/index.html'",
+    "build:api": "tsc ./backend/index.ts",
+    "build": "yarn build:front && yarn build:api",
+    "start": "node ./backend/index.js"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^18.11.9",
+    "cors": "^2.8.5",
+    "express": "4.18.2",
+    "firebase": "^9.13.0",
+    "firebase-admin": "^11.2.0",
+    "nanoid": "3.3.1",
+    "nodemon": "^2.0.20",
+    "parcel": "^2.8.0",
+    "typescript": "^4.8.4"
+  },
+  "devDependencies": {
+    "assert": "^2.0.0",
+    "browserify-zlib": "^0.2.0",
+    "buffer": "^5.5.0",
+    "crypto-browserify": "^3.12.0",
+    "events": "^3.1.0",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "path-browserify": "^1.0.0",
+    "process": "0.11.10",
+    "punycode": "^1.4.1",
+    "querystring-es3": "^0.2.1",
+    "stream-browserify": "^3.0.0",
+    "stream-http": "^3.1.0",
+    "url": "^0.11.0",
+    "util": "^0.12.3"
+  }
+}

@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Roboto+Condensed:wght@400;700&family=Roboto:ital,wght@0,300;0,500;1,700&display=swap');
+
+:root {
+    --fondo-primario:#2f2f2f;
+    --font-gana: #5cb34f;
+    --font-pierde:#ec1056;
+    --font-empate: #7d7d7d;
+
+
+    --titulo-color:#12aee2;
+    --sub-titulo-color:#656566;
+    
+    --boton-fondo:#3d3a3a;
+    --boton-font:#e4e2e2;
+    --boton-borde:#656566;
+    
+    --resultados-fondo:#ffffff;
+    --resultados-font:#ec1056;
+    --resultados-borde:#ec1056;
+
+    
+ }
+ * {
+    box-sizing: border-box;
+ }
+ body {
+    background:var(--fondo-primario);
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-size: cover;
+    text-transform: uppercase;
+    margin: 0;
+    font-family: 'Fredoka One', sans-serif;
+ }
