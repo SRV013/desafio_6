@@ -1,7 +1,7 @@
 const API_BASE_URL =
     process.env.NODE_ENV == "production"
         ? "https://m6-desafio.onrender.com/"
-        : "http://localhost:1000";
+        : "http://localhost:8080";
 
 const state = {
     data: {},
