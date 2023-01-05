@@ -2,6 +2,7 @@ import * as express from "express";
 import { firestore, rtdb } from "./db";
 import { nanoid } from "nanoid";
 import * as cors from "cors";
+import * as path from "path";
 const app = express();
 const port = process.env.PORT || 8080;
 app.use(express.static("dist"));
@@ -276,7 +277,8 @@ app.get("/tipojugada/:id", (req, res) => {
 }),
 
 app.get("*", (req,res)=>{
-    res.sendFile(__dirname + "./dist/index.html")
+    const ruta = path.resolve(__dirname + "../frontend-dist/index.html")
+    res.sendFile(ruta)
 });
 
 app.listen(port, () => {
