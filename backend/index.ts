@@ -275,7 +275,10 @@ app.get("/tipojugada/:id", (req, res) => {
     });
 }),
 
-app.get("*", express.static(__dirname + "/dist/index.html"));
+app.get("*", (req,res)=>{
+    res.sendFile(__dirname + "./dist/index.html")
+});
+
 app.listen(port, () => {
     console.log(`http://localhost:${port}`);
 });
