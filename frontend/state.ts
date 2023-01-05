@@ -5,7 +5,7 @@ const API_BASE_URL =
 
 const state = {
     data: {},
-    listeners: [],
+    // listeners: [],
 
     getStorage() {
         const ultimoestado = localStorage.getItem("state");
@@ -20,9 +20,9 @@ const state = {
         }
         console.log("MI ESTADO ", this.data);
     },
-    subscribe(callback: (any) => any) {
-        this.listeners.push(callback);
-    },
+    // subscribe(callback: (any) => any) {
+    //     this.listeners.push(callback);
+    // },
     nuevoParticipante(callback?) {
         const estadoActual = this.getState();
         if (estadoActual.nombre) {
