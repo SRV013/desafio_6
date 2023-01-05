@@ -4,7 +4,8 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
-    "module": "CommonJS"
+    "module": "CommonJS",
+    "outDir": "./backend-dist"
   },
- "files": ["backend/index.ts"]
+ "include": ["./backend/**/*.ts"]
 }
