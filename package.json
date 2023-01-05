@@ -6,7 +6,7 @@
   "scripts": {
     "dev:front": "parcel serve ./frontend/index.html",
     "dev:api": "nodemon ./backend/index.ts",
-    "build:front": "parcel build './frontend/index.html'",
+    "build:front": "parcel build ./frontend/index.html --dist-dir ./dist",
     "build:api": "tsc ./backend/index.ts",
     "build": "yarn build:front && yarn build:api",
     "start": "node ./backend/index.js"
