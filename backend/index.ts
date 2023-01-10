@@ -1,17 +1,13 @@
-import * as express from "express";
 import { firestore, rtdb } from "./db";
 import { nanoid } from "nanoid";
 import * as cors from "cors";
 import * as path from "path";
+import * as express from "express";
 const app = express();
-const port = process.env.PORT || 8080;
-app.use(express.static("dist"));
-app.use(
-    express.json({
-        limit: "50mb",
-    })
-);
 app.use(cors());
+app.use(express.json({ limit: "75mb" }));
+app.use(express.json());
+const port = process.env.PORT || 8080;
 const usuariosColeccion = firestore.collection("usuarios");
 const salasColeccion = firestore.collection("salas");
 
@@ -268,19 +264,19 @@ app.get("/manos/:salaId", (req, res) => {
 });
 
 app.get("/tipojugada/:id", (req, res) => {
-    const salaRtdbId = req.params.id;    
+    const salaRtdbId = req.params.id;
     const sala = rtdb.ref("salas/" + salaRtdbId);
     sala.once("value", (e) => {
         const re = e.val();
-       res.json(re);
+        res.json(re);
     });
-}),
-
-app.get("*", (req,res)=>{
-    const ruta = path.resolve(__dirname + "../frontend-dist/index.html")
-    res.sendFile(ruta)
 });
 
+const relativeRoute = path.resolve(__dirname, "../../dist");
+app.use(express.static(relativeRoute));
+app.get("*", function (req, res) {
+    res.sendFile(relativeRoute + "/index.html");
+});
 app.listen(port, () => {
     console.log(`http://localhost:${port}`);
 });

@@ -1,9 +1,16 @@
-import { initRouter } from "./routes";
-import "./componets/piedra";
-import "./componets/papel";
-import "./componets/tijera";
-import "./componets/boton";
-(function () {
-    const root = document.querySelector(".root") as Element;
-    initRouter(root);
-})(); 
+import "./routes";
+import "./componets/papel/";
+import "./componets/tijera/";
+import "./componets/piedra/";
+import "./componets/boton/";
+import "./pages/inicio/";
+import "./pages/juegos/";
+import "./pages/juegosi/";
+import "./pages/marcador/";
+import "./pages/marcadori/";
+import "./pages/nfront/";
+import "./pages/nback/";
+import "./pages/partida/";
+import "./pages/partidai/";
+import "./pages/resultados/";
+import "./pages/resultadosi/";

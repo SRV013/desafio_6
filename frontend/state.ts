@@ -1,12 +1,8 @@
-const API_BASE_URL =
-    process.env.NODE_ENV == "production"
-        ? "https://m6-desafio.onrender.com/"
-        : "http://localhost:8080";
-
+import "dotenv/config";
+const API_BASE_URL = process.env.API_HOST;
 const state = {
     data: {},
-    // listeners: [],
-
+    listeners: [],
     getStorage() {
         const ultimoestado = localStorage.getItem("state");
     },
@@ -15,14 +11,12 @@ const state = {
     },
     setState(estadoNuevo) {
         this.data = estadoNuevo;
-        for (const cb of this.listeners) {
+        for (const cb of this.listeners) {  
             cb();
         }
         console.log("MI ESTADO ", this.data);
     },
-    // subscribe(callback: (any) => any) {
-    //     this.listeners.push(callback);
-    // },
+   
     nuevoParticipante(callback?) {
         const estadoActual = this.getState();
         if (estadoActual.nombre) {
@@ -67,10 +61,8 @@ const state = {
                 });
         }
     },
-
     buscarSalaId(callback?) {
         const ea = this.getState();
-        this.setState(ea);
         if (ea.idSala) {
             fetch(API_BASE_URL + "/salasleer", {
                 method: "post",
@@ -94,8 +86,7 @@ const state = {
                 });
         }
     },
-
-    valJugadas(cb?) {
+    valJugadas() {
         const cs = this.getState();
         const salaRtdbId = cs.salaRtdbId;
         fetch(API_BASE_URL + "/tipojugada/" + salaRtdbId, {
@@ -116,6 +107,7 @@ const state = {
                 cs.ganados_anfitrion = js.ganados_anfitrion;
                 cs.ganados_invitados = js.ganados_invitados;
                 cs.empates = js.empates;
+
                 cs.salaSet = js.sala_disponible;
                 cs.resultado = js.resultado;
                 cs.jugador_pase = js.jugador_pase;
@@ -149,7 +141,7 @@ const state = {
                     }
                 }
                 this.setState(cs);
-                cb(cs);
+                //      cb(cs);
             });
     },
     jugadaCreador(creador: string) {
@@ -182,66 +174,6 @@ const state = {
             });
         }
     },
-    ganador(callback?) {
-        // const cs = this.getState();
-        // const salaRtdbId = cs.salaRtdbId;
-        // fetch(API_BASE_URL + "/tipojugada_ganador/" + salaRtdbId, {
-        //     method: "get",
-        //     headers: { "content-type": "application/json" },
-        // })
-        //     .then((res) => {
-        //         return res.json();
-        //     })
-        //     .then((datos) => {
-        //         callback(datos);
-        //     });
-        // const cs = this.getState();
-        // const sala = ref(rtdb, "/salas/" + cs.salaRtdbId);
-        // onValue(sala, (juegores) => {
-        //     const js = juegores.val();
-        //     cs.jugador_nombre = js.jugador_nombre;
-        //     cs.jugador_jugada = js.jugador_jugada;
-        //     cs.invitado_nombre = js.invitado_nombre;
-        //     cs.invitado_jugada = js.invitado_jugada;
-        //     cs.invitado_id = js.invitado_id;
-        //     cs.ganados_anfitrion = js.ganados_anfitrion;
-        //     cs.ganados_invitados = js.ganados_invitados;
-        //     cs.empates = js.empates;
-        //     cs.salaSet = js.sala_disponible;
-        //     cs.resultado = js.resultado;
-        //     cs.jugador_pase = js.jugador_pase;
-        //     cs.invitado_pase = js.invitado_pase;
-        //     const jugadaCre = js.jugador_jugada;
-        //     const jugadaInv = js.invitado_jugada;
-        //     const empate = [
-        //         jugadaCre == "tijera" && jugadaInv == "tijera",
-        //         jugadaCre == "piedra" && jugadaInv == "piedra",
-        //         jugadaCre == "papel" && jugadaInv == "papel",
-        //     ];
-        //     if (empate.includes(true)) {
-        //         cs.resultado = "empates";
-        //     }
-        //     const juego = [
-        //         jugadaCre == "tijera" && jugadaInv == "papel",
-        //         jugadaCre == "piedra" && jugadaInv == "tijera",
-        //         jugadaCre == "papel" && jugadaInv == "piedra",
-        //     ];
-        //     if (juego.includes(true)) {
-        //         cs.resultado = "ganador anfitrion";
-        //     } else {
-        //         const juego = [
-        //             jugadaInv == "tijera" && jugadaCre == "papel",
-        //             jugadaInv == "piedra" && jugadaCre == "tijera",
-        //             jugadaInv == "papel" && jugadaCre == "piedra",
-        //         ];
-        //         if (juego.includes(true)) {
-        //             cs.resultado = "ganador invitado";
-        //         }
-        //     }
-        //     this.setState(cs);
-        // });
-    },
-
     // SI JUEGA REVANCHA
     resetear(tipo: string) {
         const cs = this.getState();
@@ -309,7 +241,6 @@ const state = {
             } else {
                 cs.empates = cs.empates + 1;
             }
-
             fetch(API_BASE_URL + "/guardajuego/" + idSala, {
                 method: "post",
                 headers: { "content-type": "application/json" },
@@ -340,7 +271,7 @@ const state = {
     },
 
     // SI SALE BORRA DATOS Y CIERRA SALA
-    jugadasresultados(callback?) {
+    jugadasresultados(cb) {
         const cs = this.getState();
         if (cs.idSala) {
             fetch(API_BASE_URL + "/jugadasresultados/" + cs.idSala, {
@@ -353,12 +284,7 @@ const state = {
                     return res.json();
                 })
                 .then((e) => {
-                    cs.Derrotas = e.Derrotas;
-                    cs.Empates = e.Empates;
-                    cs.Victoria = e.Victoria;
-                    cs.invitado_nombre = e.su_nombre;
-                    this.setState(cs);
-                    if (callback) callback();
+                    cb(e);
                 });
         }
     },

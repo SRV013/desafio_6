@@ -1,9 +1,12 @@
+import { Router } from "@vaadin/router";
 import { state } from "../../state";
-export function init(params) {    
-    const div = document.createElement("div");
-    div.classList.add("container");
-    const style = document.createElement("style");
-    div.innerHTML = ` 
+export class Juegos extends HTMLElement {
+    connectedCallback() {
+        this.render();
+    }
+    render() {
+        this.innerHTML = ` 
+    <div class="container">
     <p class="hola">Hola ${state.getState().nombre}</p>
     <div class="tipo-top">
       <tipo-piedra class="piedra-top  tipo-top-bloqueado"></tipo-piedra>
@@ -16,154 +19,102 @@ export function init(params) {
     <tipo-papel class="papel"></tipo-papel>
     <tipo-tijera class="tijera"></tipo-tijera>
     </div>
+    </div>
     `;
-    style.innerHTML = `
-   .container {
-      height: 100vh;
-      padding-top: 100px;
-      display: flex;
-      align-items: center;
-      flex-direction: column;
-      justify-content: space-around;
-      align-content: space-around;
-      flex-wrap: wrap;
-    }
-    .turno {
-        width:180px;
-        height:180px;
-        border-radius:50%;
-        border:2px solid #5a5a5a;
-        display:flex;
-        flex-direction: column;
-        justify-content: space-around;
-        align-items: center;
-        border-left-color:var(--boton-font);
-        border-right-color:var(--boton-font);
-    }    
-    .hola{
-        font-size: 24px;
-        color: var(--boton-font);  
-    }
-    .turno-a{
-        font-size: 20px;
-        color: var(--boton-font);  
-        animation-name: anim;
-		animation-duration: 1s;
-		animation-iteration-count: infinite;      
-    }
-    @keyframes anim{
-         0% { opacity: 1.0; }
-        50% { opacity: 0.7; }
-     }
-    .tipos {
-      display: flex;
-	   justify-content:center;
-    } 
-    .tipo-bloqueado{
-      transition: all 1s ease-in-out;
-      filter: blur(4px);
-   }
-   .tipo-activos {
-      display: inherit;
-      transform: translateY(-30px);
-      transition: all 0.5s;
-    }
-    .tipo-desactivos {
-      transform: translateY(30px);
-      transform: scale(0.5);
-    }
-    .tipo-top {
-      display: flex;
-	   justify-content:center;
-    } 
-    .tipo-top-bloqueado{
-      transition: all 1s ease-in-out;
-      filter: blur(4px);
-      transform: scale(0.7);
-   }
-   .tipo-top-activos {
-      display: inherit;
-      transform: translateY(80px);
-      transition: all 0.5s;
-      filter:none;
-    }`;
-    // LEER CLASES
-    const tiposCont = div.querySelector(".tipos") as Element;
-    const mensaje =   div.querySelector(".turno-a") as Element;
-    const tipotijera = div.querySelector(".tijera") as Element;
-    const tipopiedra = div.querySelector(".piedra") as Element;
-    const tipopapel = div.querySelector(".papel") as Element;
-    const tipopiedraTop = div.querySelector(".piedra-top") as Element;
-    const tipopapelTop = div.querySelector(".papel-top") as Element;
-    const tipotijeraTop = div.querySelector(".tijera-top") as Element;
-    // PASA FUNCION A LO ELEGIDO POR EL USUARIO
-    for (const creador of tiposCont.children) {
-        creador.addEventListener("click", () => {
-            const type = creador.getAttribute("class");
-            if (type == "tijera") {
-                state.jugadaCreador("tijera");
-                activetipos("tijera");
-            } else if (type == "piedra") {
-                state.jugadaCreador("piedra");
-                activetipos("piedra");
-            } else if (type == "papel") {
-                state.jugadaCreador("papel");
-                activetipos("papel");
+        // LEER CLASES
+        const tiposCont = this.querySelector(".tipos") as Element;
+        const mensaje = this.querySelector(".turno-a") as Element;
+        const tipotijera = this.querySelector(".tijera") as Element;
+        const tipopiedra = this.querySelector(".piedra") as Element;
+        const tipopapel = this.querySelector(".papel") as Element;
+        const tipopiedraTop = this.querySelector(".piedra-top") as Element;
+        const tipopapelTop = this.querySelector(".papel-top") as Element;
+        const tipotijeraTop = this.querySelector(".tijera-top") as Element;
+        const counterEl = this.querySelector(".turno-a") as any;
+        // CUENTA
+        let counter = 10;
+        const contadorTime = setInterval(() => {
+            counter--;
+            counterEl.style.fontSize = "80px";
+            counterEl.style.color = "#a4c006";
+            counterEl.textContent = String(counter);
+            if (counter < 1) {
+                const manos = ["piedra", "papel", "tijera"];
+                const eligio = manos[Math.floor(Math.random() * 3)];
+                state.jugadaCreador(eligio);
+                activetipos(eligio);
+                clearInterval(contadorTime);
             }
-        });
-    }
-    // SELECCION DE LO ELEGIDO POR CREADOR
-    function activetipos(param) {
-        for (const tipo of tiposCont.children) {
-            tipo.classList.add("tipo-desactivos");
-        }
-        if (param == "tijera") {
-            tipotijera.classList.add("tipo-activos");
-            tipotijera.classList.remove("tipo-desactivos");
-            tipopiedra.classList.add("tipo-bloqueado");
-            tipopapel.classList.add("tipo-bloqueado");
-        }
-        if (param == "piedra") {
-            tipopiedra.classList.add("tipo-activos");
-            tipopiedra.classList.remove("tipo-desactivos");
-            tipotijera.classList.add("tipo-bloqueado");
-            tipopapel.classList.add("tipo-bloqueado");
-        }
-        if (param == "papel") {
-            tipopapel.classList.add("tipo-activos");
-            tipopapel.classList.remove("tipo-desactivos");
-            tipotijera.classList.add("tipo-bloqueado");
-            tipopiedra.classList.add("tipo-bloqueado");
-        }
-        //     // TIMER Q DISPARA A RESULTADO
-        const timeCreador = setInterval(() => {
-            state.ganador();
-            const cs = state.getState();
-            mensaje.innerHTML = "AGUARDE ...";        
-            if ((
-                cs.resultado == "ganador anfitrion" ||
-                cs.resultado == "ganador invitado" ||
-                cs.resultado == "empates")
-                && cs.invitado_pase == true
-            ) {
-                if (cs.invitado_jugada == "tijera") {
-                    tipotijeraTop.classList.add("tipo-top-activos");
+        }, 1000);
+
+        // PASA FUNCION A LO ELEGIDO POR EL USUARIO
+        for (const creador of tiposCont.children) {
+            creador.addEventListener("click", () => {
+                clearInterval(contadorTime);
+                counterEl.style.color = "";
+                counterEl.style.fontSize = "20px";
+                mensaje.innerHTML = "AGUARDE ...";
+                const type = creador.getAttribute("class");
+                if (type == "tijera") {
+                    state.jugadaCreador("tijera");
+                    activetipos("tijera");
+                } else if (type == "piedra") {
+                    state.jugadaCreador("piedra");
+                    activetipos("piedra");
+                } else if (type == "papel") {
+                    state.jugadaCreador("papel");
+                    activetipos("papel");
                 }
-                if (cs.invitado_jugada == "piedra") {
-                    tipopiedraTop.classList.add("tipo-top-activos");
-                }
-                if (cs.invitado_jugada == "papel") {
-                    tipopapelTop.classList.add("tipo-top-activos");
-                }
-                function jugadarival() {
+            });
+        }
+        // SELECCION DE LO ELEGIDO POR CREADOR
+        function activetipos(param) {
+            for (const tipo of tiposCont.children) {
+                tipo.classList.add("tipo-desactivos");
+            }
+            if (param == "tijera") {
+                tipotijera.classList.add("tipo-activos");
+                tipotijera.classList.remove("tipo-desactivos");
+                tipopiedra.classList.add("tipo-bloqueado");
+                tipopapel.classList.add("tipo-bloqueado");
+            }
+            if (param == "piedra") {
+                tipopiedra.classList.add("tipo-activos");
+                tipopiedra.classList.remove("tipo-desactivos");
+                tipotijera.classList.add("tipo-bloqueado");
+                tipopapel.classList.add("tipo-bloqueado");
+            }
+            if (param == "papel") {
+                tipopapel.classList.add("tipo-activos");
+                tipopapel.classList.remove("tipo-desactivos");
+                tipotijera.classList.add("tipo-bloqueado");
+                tipopiedra.classList.add("tipo-bloqueado");
+            }
+            //     // TIMER Q DISPARA A RESULTADO
+            const timeCreador = setInterval(() => {
+                const cs = state.getState();
+                state.valJugadas();
+                if (
+                    (cs.resultado == "ganador anfitrion" ||
+                        cs.resultado == "ganador invitado" ||
+                        cs.resultado == "empates") &&
+                    cs.invitado_pase == true
+                ) {
+                    if (cs.invitado_jugada == "tijera") {
+                        tipotijeraTop.classList.add("tipo-top-activos");
+                    }
+                    if (cs.invitado_jugada == "piedra") {
+                        tipopiedraTop.classList.add("tipo-top-activos");
+                    }
+                    if (cs.invitado_jugada == "papel") {
+                        tipopapelTop.classList.add("tipo-top-activos");
+                    }
                     state.guardaresultado();
-                    params.goTo("/resultados");
+                    clearInterval(timeCreador);
+                    Router.go("/resultados");
                 }
-                setTimeout(jugadarival, 1000);
-                clearInterval(timeCreador);
-            }
-        }, 2000);
+            }, 1000);
+        }
     }
-    div.appendChild(style);
-    return div;
 }
+customElements.define("juegos-pagina", Juegos);

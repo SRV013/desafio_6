@@ -14,7 +14,6 @@ customElements.define(
          this.shadow.innerHTML = `
             <img class="tipo-papel" src="${papel}">
         `;
-
          style.innerHTML = `
             .tipo-papel {
               height: 80%;

@@ -1,11 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "allowSyntheticDefaultImports": true,
-    "module": "CommonJS",
-    "outDir": "./backend-dist"
+      "target":"ESNext",
+      "module":"CommonJS",
+      "moduleResolution": "node",
+      "resolveJsonModule": true,
+      "outDir": "be-dist"
   },
- "includes": ["./backend/**/*.ts"]
+  "includes":["./backend/**/*.ts"]    
 }
