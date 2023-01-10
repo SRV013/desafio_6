@@ -1,5 +1,4 @@
-import "dotenv/config";
-const API_BASE_URL = process.env.API_HOST;
+const API_BASE_URL = "https://m6-desafio.onrender.com";
 const state = {
     data: {},
     listeners: [],
