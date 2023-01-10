@@ -4,7 +4,7 @@ Desafio 6
 
 AppWeb
 
-https://mod-6.herokuapp.com/inicio
+https://m6-desafio.onrender.com
 
 Documentacion 
 
