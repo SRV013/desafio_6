@@ -1,26 +1,19 @@
 {
-  "name": "trabajofinal",
+  "name": "prueba3",
   "version": "1.0.0",
-  "license": "UNLICENSED",
-  "scripts": {
-    "dev:front": "parcel serve ./frontend/index.html",
-    "dev:api": "nodemon --watch ./backend/index.ts  --exec ts-node ./backend/index.ts",
-    "build:be": "tsc",
-    "build:fe": "parcel build ./frontend/index.html --dist-dir ./dist",
-    "build": "yarn build:be && yarn build:fe",
-    "start": "node ./be-dist/backend/index.js"
-  },
+  "license": "MIT",
   "dependencies": {
-    "@types/node": "^18.11.9",
     "@vaadin/router": "^1.7.4",
-    "cors": "^2.8.5",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "firebase": "^9.13.0",
-    "firebase-admin": "^11.2.0",
-    "nanoid": "3.3.1",
-    "nodemon": "^2.0.20",
-    "parcel": "^2.8.2",
-    "typescript": "^4.9.3"
+    "firebase": "^9.10.0",
+    "firebase-admin": "^11.0.1",
+    "lodash": "^4.17.21",
+    "nanoid": "^4.0.0",
+    "parcel": "^2.0.0-rc.0"
+  },
+  "devDependencies": {
+    "prettier": "2.7.1"
+  },
+  "scripts": {
+    "start": "parcel ./src/index.html"
   }
 }
