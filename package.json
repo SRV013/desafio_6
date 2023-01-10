@@ -1,8 +1,7 @@
 {
   "name": "trabajofinal",
   "version": "1.0.0",
-  "repository": "git@github.com:SRV013/desafioseis.git",
-  "author": "srv013 <srv013@gmail.com>",
+  "license": "UNLICENSED",
   "scripts": {
     "dev:front": "parcel serve ./frontend/index.html",
     "dev:api": "nodemon --watch ./backend/index.ts  --exec ts-node ./backend/index.ts",
@@ -11,7 +10,6 @@
     "build": "yarn build:be && yarn build:fe",
     "start": "node ./be-dist/backend/index.js"
   },
-  "license": "MIT",
   "dependencies": {
     "@types/node": "^18.11.9",
     "@vaadin/router": "^1.7.4",
@@ -28,18 +26,18 @@
   "devDependencies": {
     "assert": "^2.0.0",
     "browserify-zlib": "^0.2.0",
-    "buffer": "^5.5.0",
+    "buffer": "^5.7.1",
     "crypto-browserify": "^3.12.0",
-    "events": "^3.1.0",
+    "events": "^3.3.0",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
-    "path-browserify": "^1.0.0",
+    "path-browserify": "^1.0.1",
     "process": "0.11.10",
     "punycode": "^1.4.1",
     "querystring-es3": "^0.2.1",
     "stream-browserify": "^3.0.0",
     "stream-http": "^3.1.0",
     "url": "^0.11.0",
-    "util": "^0.12.3"
+    "util": "^0.12.5"
   }
 }
