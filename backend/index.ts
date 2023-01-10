@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: "75mb" }));
 app.use(express.json());
-const port = process.env.PORT || 8080;
+const port = "https://m6-desafio.onrender.com";
 const usuariosColeccion = firestore.collection("usuarios");
 const salasColeccion = firestore.collection("salas");
 
