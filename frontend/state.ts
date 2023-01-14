@@ -1,5 +1,4 @@
-import "dotenv/config";
-import { createBrotliCompress } from "zlib";
+require('dotenv').config()  
 const API_BASE_URL = process.env.API_HOST;
 
 const state = {
