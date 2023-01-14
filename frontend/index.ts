@@ -11,6 +11,7 @@ import "./pages/marcadori/";
 import "./pages/nfront/";
 import "./pages/nback/";
 import "./pages/partida/";
-import "./pages/partidai/";
+import "./pages/partidai/anfitrion";
+import "./pages/partidai/invitado";
 import "./pages/resultados/";
 import "./pages/resultadosi/";

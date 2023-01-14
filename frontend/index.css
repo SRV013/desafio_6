@@ -28,7 +28,7 @@ body {
 }
 .container {
     height: 95vh;
-    padding-top: 80px;
+    padding-top: 30px;
     display: flex;
     align-items: center;
     flex-direction: column;
@@ -65,25 +65,39 @@ body {
 @keyframes reglas-flecha {
     0% {
         color: #40dcff;
-        transform: translateY(1px);
     }
     25% {
         color: #40dcff;
-        transform: translateY(2px);
     }
     50% {
         color: #40dcff;
-        transform: translateY(4px);
     }
     75% {
         color: #ff85ff;
-        transform: translateY(2px);
     }
     100% {
         color: #ff85ff;
-        transform: translateY(1px);
     }
 }
+.espera{
+  font-size: 22px;
+  position: relative;
+  animation-name: espera-day;
+  animation-duration: 1.5s;
+  animation-iteration-count: infinite;
+  color: #a4c006;
+}
+@keyframes espera-day {
+  20%, 50%, 80% {
+    transform: translateY(0);
+}
+40% {
+  transform: translateY(-30px);
+}
+
+60% {
+  transform: translateY(-15px);
+}}
 .tipo_muestra {
     display: flex;
     justify-content: center;
@@ -265,12 +279,15 @@ body {
    display: inherit;
    height: 60px;
  }
- 
+.historial{
+  overflow: scroll;
+  max-height: 400px;
+} 
  .manos{
    display: flex;
    flex-direction: column-reverse;
 }
- .manos-resultados{
+.manos-resultados{
    display: flex;
    width: 100%;
    justify-content: space-evenly;

@@ -41,23 +41,6 @@ app.post("/participantes", (req, res) => {
             }
         });
 });
-
-// OBTENER NUEVO PARTICIPANTE
-app.get("/participantes/:bodyId", (req, res) => {
-    const docId = req.params.bodyId;
-    const docResul = usuariosColeccion.doc(docId);
-    docResul.get().then((results) => {
-        if (results.exists) {
-            const nombreParticipante = results.data();
-            res.json(nombreParticipante);
-        } else {
-            res.status(401).json({
-                message: "nombre de participante no existe !!!",
-            });
-        }
-    });
-});
-
 // CREA UNA SALA DE JUEGOS
 app.post("/salas", (req, res) => {
     const participanteId = req.body.participanteId;
@@ -71,11 +54,8 @@ app.post("/salas", (req, res) => {
                 salaRef
                     .set({
                         sala_disponible: true,
-                        jugador_id: participanteId,
-                        jugador_nombre: nombre,
-                        empates: 0,
-                        ganados_anfitrion: 0,
-                        ganados_invitados: 0,
+                        tu_id: participanteId,
+                        tu_nombre: nombre,
                     })
                     .then(() => {
                         const salaRtdbId = salaRef.key;
@@ -101,151 +81,121 @@ app.post("/salas", (req, res) => {
             }
         });
 });
-// LEER SALA CREADA POR JUGADOR
-app.post("/salasleer", (req, res) => {
-    const { salaId, jugadorId, jugadorNombre } = req.body;
-    const docSala = salasColeccion.doc(salaId);
-    docSala.get().then((results) => {
-        if (results.exists) {
-            const salaRt = results.data();
-            rtdb.ref("salas/" + salaRt.salaRtdbId).update({
-                sala_disponible: false,
-                invitado_id: jugadorId,
-                invitado_nombre: jugadorNombre,
-            });
-            res.json({ salaRtdbId: salaRt.salaRtdbId });
-        } else {
-            res.status(400).json({
-                message: "El Id de la sala no existe !!!",
-            });
-        }
-    });
-});
-// PASA DATO DE JUGADA CREADOR
-app.post("/juego_creador/", (req, res) => {
-    const { id_sala, jugada, pase } = req.body;
-    const salaRef = rtdb.ref("salas/" + id_sala);
-    salaRef
-        .update({
-            jugador_jugada: jugada,
-            jugador_pase: pase,
-            resultado: "",
-        })
-        .then(() => {
-            res.json({
-                mensaje: "recibio juegada del creador",
-            });
-        });
-});
-// PASA DATO DE JUGADA CREADOR
-app.post("/juego_invitado/", (req, res) => {
-    const { id_sala, jugada, pase } = req.body;
-    const salaRef = rtdb.ref("salas/" + id_sala);
-    salaRef
-        .update({
-            invitado_jugada: jugada,
-            invitado_pase: pase,
-            resultado: "",
-        })
-        .then(() => {
-            res.json({
-                mensaje: "recibio juegada del invitado",
-            });
-        });
-});
-
-// ACTUALIZA RESULTADO
-app.post("/f5resultado", (req, res) => {
-    const salaId = req.body.salaId;
-    const ganados = req.body.ganados;
-    const perdidos = req.body.perdidos;
-    const empates = req.body.empates;
-    const resultado = req.body.resultado;
-    const salaRef = rtdb.ref("salas/" + salaId);
-    salaRef
-        .update({
-            ganados_anfitrion: ganados,
-            ganados_invitados: perdidos,
-            empates: empates,
-            resultado: resultado,
-        })
-        .then(() => {
-            res.json({
-                mensaje: "datos actuales en juegos",
-            });
-        });
-});
-// GUARDAR RESULTADO DB FINAL ID SALA
-app.post("/guardajuego/:salaId", (req, res) => {
-    const salaId = req.body.salaId;
-    const Victoria = req.body.Victoria;
-    const Derrotas = req.body.Derrotas;
-    const Empates = req.body.Empates;
-    const su_id = req.body.su_id;
-    const su_nombre = req.body.su_nombre;
-    const tu_juego = req.body.tu_juego;
-    const su_juego = req.body.su_juego;
-
-    const docResul = salasColeccion.doc(salaId.toString());
-    docResul.update({
-        su_nombre: su_nombre,
-        su_id: su_id,
-        Victoria: Victoria,
-        Derrotas: Derrotas,
-        Empates: Empates,
-    });
-    const data = {
-        tu_juego: tu_juego,
-        su_juego: su_juego,
-    };
-
-    const ress = firestore
-        .collection("salas/" + salaId + "/jugadas")
-        .doc()
-        .set(data);
-    res.json(ress);
-});
-// RESULTADO JUGADAS
-app.get("/jugadasresultados/:salaId", (req, res) => {
-    const salaId = req.params.salaId;
+// BUSCAR SALA
+app.post("/buscarsala", (req, res) => {
+    const { salaId, nombre, idParticipante } = req.body;
     salasColeccion
         .doc(salaId)
         .get()
         .then((e) => {
-            res.json(e.data());
+            const salaRtdbId = e.data().salaRtdbId;
+            const salaRef = rtdb.ref("salas/" + salaRtdbId);
+            salaRef
+                .update({
+                    sala_disponible: false,
+                    su_nombre: nombre,
+                    su_id: idParticipante,
+                    salaId,
+                })
+                .then(() => {
+                    res.json(salaRtdbId);
+                });
         });
 });
 
-// PAUSA CREADOR
-app.post("/pausa_creador", (req, res) => {
-    const { id_sala, pase } = req.body;
-    const salaRef = rtdb.ref("salas/" + id_sala);
-    salaRef
-        .update({
-            jugador_pase: pase,
-        })
-        .then(() => {
-            res.json({
-                mensaje: "pausa creador",
+// PASA DATO DE JUGADA CREADOR
+app.post("/jugada/", (req, res) => {
+    const { salaRtdbId, jugada, quien } = req.body;
+    const salaRef = rtdb.ref("salas/" + salaRtdbId);
+    if (quien == "anfitrion") {
+        salaRef
+            .update({
+                tu_juego: jugada,
+            })
+            .then(() => {
+                res.json({
+                    mensaje: "recibio juegada del creador",
+                });
             });
+    } else {
+        salaRef
+            .update({
+                su_juego: jugada,
+            })
+            .then(() => {
+                res.json({
+                    mensaje: "recibio juegada del invitado",
+                });
+            });
+    }
+});
+// GUARDAR RESULTADO DB FINAL ID SALA
+app.post("/guardajuego", (req, res) => {
+    const data = req.body;
+    salasColeccion
+        .doc(data.salaId.toString())
+        .get()
+        .then((e) => {
+            var empates = e.data().empates || 0;
+            var derrotas = e.data().derrotas || 0;
+            var victorias = e.data().victorias || 0;
+            const empate = [
+                data.tu_juego == "tijera" && data.su_juego == "tijera",
+                data.tu_juego == "piedra" && data.su_juego == "piedra",
+                data.tu_juego == "papel" && data.su_juego == "papel",
+            ];
+            if (empate.includes(true)) {
+                empates++;
+                var ganador = "empates";
+            }
+            const juego = [
+                data.tu_juego == "tijera" && data.su_juego == "papel",
+                data.tu_juego == "piedra" && data.su_juego == "tijera",
+                data.tu_juego == "papel" && data.su_juego == "piedra",
+            ];
+            if (juego.includes(true)) {
+                victorias++;
+                var ganador = "anfitrion";
+            } else {
+                const juego = [
+                    data.su_juego == "tijera" && data.tu_juego == "papel",
+                    data.su_juego == "piedra" && data.tu_juego == "tijera",
+                    data.su_juego == "papel" && data.tu_juego == "piedra",
+                ];
+                if (juego.includes(true)) {
+                    derrotas++;
+                    var ganador = "invitado";
+                }
+            }
+            if (ganador) {
+                salasColeccion
+                    .doc(data.salaId.toString())
+                    .update({
+                        su_nombre: data.su_nombre,
+                        tu_nombre: data.tu_nombre,
+                        su_id: data.su_id,
+                        victorias,
+                        derrotas,
+                        empates,
+                        ganador,
+                        tu_juego: data.tu_juego,
+                        su_juego: data.su_juego,
+                    })
+                    .then(() => {
+                        res.json("OK");
+                    });
+                const mano = {
+                    tu_juego: data.tu_juego,
+                    su_juego: data.su_juego,
+                };
+                firestore
+                    .collection("salas/" + data.salaId + "/jugadas")
+                    .doc()
+                    .set(mano);
+            }
         });
 });
-// PAUSA INVITADO
-app.post("/pausa_invitado", (req, res) => {
-    const { id_sala, pase } = req.body;
-    const salaRef = rtdb.ref("salas/" + id_sala);
-    salaRef
-        .update({
-            invitado_pase: pase,
-        })
-        .then(() => {
-            res.json({
-                mensaje: "pausa invitado",
-            });
-        });
-});
-
-// LISTA COMPLETA DE MANOS EN SALAS
+//LISTA COMPLETA DE MANOS EN SALAS
 app.get("/manos/:salaId", (req, res) => {
     const salaId = req.params.salaId;
     const manos = [];
@@ -262,16 +212,24 @@ app.get("/manos/:salaId", (req, res) => {
             res.json(manos);
         });
 });
-
+// MARCADOR
+app.get("/marcador/:id", (req, res) => {
+    const salaId = req.params.id;
+    salasColeccion
+        .doc(salaId)
+        .get()
+        .then((e) => {
+            res.json(e.data());
+        });
+});
+// QUE JUGARON
 app.get("/tipojugada/:id", (req, res) => {
     const salaRtdbId = req.params.id;
     const sala = rtdb.ref("salas/" + salaRtdbId);
     sala.once("value", (e) => {
-        const re = e.val();
-        res.json(re);
+        res.json(e.val());
     });
 });
-
 const relativeRoute = path.resolve(__dirname, "../../dist");
 app.use(express.static(relativeRoute));
 app.get("*", function (req, res) {

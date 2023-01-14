@@ -13,21 +13,21 @@ export class MarcadorAnfitrion extends HTMLElement {
               <p class="vos">Invitado _<b class="resultwo"></b>: <i class="countwo"> </i></p>
               <p class="empates">Empates: <b class="counttre"> </b></p>
               <h3>Ultimas Jugadas</h3>
-            <div class="manos"></div> 
+            <div class="historial">  
+            <div class="manos"></div>
+            </div> 
           </div>
           <tipo-boton class="btn-volver">Volver</tipo-boton>
     </div>`;
         const padre = this.querySelector(".manos") as Element;
-        state.jugadasresultados((e) => {
+        state.marcador((e) => {
             this.querySelector(".resulone").innerHTML = e.tu_nombre;
             this.querySelector(".resultwo").innerHTML = e.su_nombre;
-            this.querySelector(".countone").innerHTML = e.Victoria;
-            this.querySelector(".countwo").innerHTML = e.Derrotas;
-            this.querySelector(".counttre").innerHTML = e.Empates;
+            this.querySelector(".countone").innerHTML = e.victorias;
+            this.querySelector(".countwo").innerHTML = e.derrotas;
+            this.querySelector(".counttre").innerHTML = e.empates;
         });
-        const cs = state.getState();
-        state.manos(() => {
-            const mano = cs.manos;
+        state.manos((mano) => {
             if (mano) {
                 for (var i = 0; i < mano.length; i++) {
                     const manos = document.createElement("_jugadas");

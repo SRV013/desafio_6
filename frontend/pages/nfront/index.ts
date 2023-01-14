@@ -15,26 +15,20 @@ export class JuegoAnfitrion extends HTMLElement {
    </form>
    </div>
     `;
-    const buttonEl = this.querySelector(".btn-crear");
-    buttonEl?.addEventListener("click", (e) => {
-        e.preventDefault();
-        form?.dispatchEvent(new Event("submit"));
-    });
-
-    const form: any = this.querySelector(".form");
-    form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        const target = e.target as any;
-        const nombre = target.nombrecamp.value;
-        const estadoActual = state.getState();
-        estadoActual.nombre = nombre;
-        state.nuevoParticipante(() => {
-            state.nuevaSala(() => {
-                state.valJugadas();
-                  Router.go("/partida");
+        const buttonEl = this.querySelector(".btn-crear");
+        buttonEl?.addEventListener("click", (e) => {
+            e.preventDefault();
+            form?.dispatchEvent(new Event("submit"));
+        });
+        const form: any = this.querySelector(".form");
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const target = e.target as any;
+            const nombre = target.nombrecamp.value;
+            state.nuevoParticipante(nombre, (e) => {
+                Router.go("/partida");
             });
         });
-    });
-}
+    }
 }
 customElements.define("nfront-web", JuegoAnfitrion);

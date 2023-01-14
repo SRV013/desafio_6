@@ -2,25 +2,28 @@ import { Router } from "@vaadin/router";
 import { state } from "../../state";
 export class Juegos extends HTMLElement {
     connectedCallback() {
+        state.valJugadas((e) => {
+            this.querySelector(".hola").innerHTML = "Hola , " + e.tu_nombre;
+        });
         this.render();
     }
     render() {
         this.innerHTML = ` 
     <div class="container">
-    <p class="hola">Hola ${state.getState().nombre}</p>
-    <div class="tipo-top">
-      <tipo-piedra class="piedra-top  tipo-top-bloqueado"></tipo-piedra>
-      <tipo-papel class="papel-top  tipo-top-bloqueado"></tipo-papel >
-      <tipo-tijera class="tijera-top  tipo-top-bloqueado"></tipo-tijera>
-   </div>
-    <div class="turno"><a class="turno-a">su turno</a></div>
-    <div class="tipos">
-    <tipo-piedra class="piedra"></tipo-piedra>
-    <tipo-papel class="papel"></tipo-papel>
-    <tipo-tijera class="tijera"></tipo-tijera>
-    </div>
-    </div>
-    `;
+        <p class="hola"></p>
+        <div class="reglas">tenes 10 segundos para jugar o la CPU lo Hara por ti !!!</div>  
+        <div class="tipo-top">
+                <tipo-piedra class="piedra-top  tipo-top-bloqueado"></tipo-piedra>
+                <tipo-papel class="papel-top  tipo-top-bloqueado"></tipo-papel >
+                <tipo-tijera class="tijera-top  tipo-top-bloqueado"></tipo-tijera>
+        </div>
+        <div class="turno"><a class="turno-a">su turno</a></div>
+            <div class="tipos">
+                    <tipo-piedra class="piedra"></tipo-piedra>
+                    <tipo-papel class="papel"></tipo-papel>
+                    <tipo-tijera class="tijera"></tipo-tijera>
+            </div>
+        </div>`;
         // LEER CLASES
         const tiposCont = this.querySelector(".tipos") as Element;
         const mensaje = this.querySelector(".turno-a") as Element;
@@ -41,7 +44,7 @@ export class Juegos extends HTMLElement {
             if (counter < 1) {
                 const manos = ["piedra", "papel", "tijera"];
                 const eligio = manos[Math.floor(Math.random() * 3)];
-                state.jugadaCreador(eligio);
+                state.jugada("anfitrion", eligio);
                 activetipos(eligio);
                 clearInterval(contadorTime);
             }
@@ -56,13 +59,13 @@ export class Juegos extends HTMLElement {
                 mensaje.innerHTML = "AGUARDE ...";
                 const type = creador.getAttribute("class");
                 if (type == "tijera") {
-                    state.jugadaCreador("tijera");
+                    state.jugada("anfitrion", "tijera");
                     activetipos("tijera");
                 } else if (type == "piedra") {
-                    state.jugadaCreador("piedra");
+                    state.jugada("anfitrion", "piedra");
                     activetipos("piedra");
                 } else if (type == "papel") {
-                    state.jugadaCreador("papel");
+                    state.jugada("anfitrion", "papel");
                     activetipos("papel");
                 }
             });
@@ -90,29 +93,31 @@ export class Juegos extends HTMLElement {
                 tipotijera.classList.add("tipo-bloqueado");
                 tipopiedra.classList.add("tipo-bloqueado");
             }
-            //     // TIMER Q DISPARA A RESULTADO
+            // TIMER Q DISPARA A RESULTADO
             const timeCreador = setInterval(() => {
-                const cs = state.getState();
-                state.valJugadas();
-                if (
-                    (cs.resultado == "ganador anfitrion" ||
-                        cs.resultado == "ganador invitado" ||
-                        cs.resultado == "empates") &&
-                    cs.invitado_pase == true
-                ) {
-                    if (cs.invitado_jugada == "tijera") {
-                        tipotijeraTop.classList.add("tipo-top-activos");
+                state.valJugadas((e) => {
+                    if (e.tu_juego != "ninguna" && e.su_juego != "ninguna"){
+                        if (e.su_juego == "tijera") {
+                            tipotijeraTop.classList.add("tipo-top-activos");
+                        }
+                        if (e.su_juego == "piedra") {
+                            tipopiedraTop.classList.add("tipo-top-activos");
+                        }
+                        if (e.su_juego == "papel") {
+                            tipopapelTop.classList.add("tipo-top-activos");
+                        }
+                        state.guardaresultado(e, (resultado) => {
+                            if (resultado) {         
+                                
+                                setTimeout(() => {
+                                    Router.go("/resultados");
+                                  }, 1000);
+                                  
+                            }
+                        });
+                        clearInterval(timeCreador);
                     }
-                    if (cs.invitado_jugada == "piedra") {
-                        tipopiedraTop.classList.add("tipo-top-activos");
-                    }
-                    if (cs.invitado_jugada == "papel") {
-                        tipopapelTop.classList.add("tipo-top-activos");
-                    }
-                    state.guardaresultado();
-                    clearInterval(timeCreador);
-                    Router.go("/resultados");
-                }
+                });
             }, 1000);
         }
     }
