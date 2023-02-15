@@ -114,6 +114,7 @@ const state = {
                 headers: { "content-type": "application/json" },
                 body: JSON.stringify(data),
             }).then((res) => {
+                localStorage.setItem("ganador", 'OK');
                 cb(res);
             });
         }
