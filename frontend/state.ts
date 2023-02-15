@@ -112,9 +112,8 @@ const state = {
             fetch(API_BASE_URL + "/guardajuego", {
                 method: "post",
                 headers: { "content-type": "application/json" },
-                body: JSON.stringify(data),
+                body: JSON.stringify({...data , salaRtdbId}),
             }).then((res) => {
-                localStorage.setItem("ganador", 'OK');
                 cb(res);
             });
         }
@@ -135,6 +134,19 @@ const state = {
                 });
         }
     },
+     pase(){
+    const salaRtdbId = localStorage.getItem("salaRtdbId");
+    if (salaRtdbId) {
+        fetch(API_BASE_URL + "/pase/" + salaRtdbId, {
+            method: "pathc",
+            headers: { "content-type": "application/json" },
+            body: JSON.stringify(salaRtdbId),
+        })
+            .then((res) => {
+                return res.json();
+            })
+        } 
+ },
     manos(cb?) {
         const salaId = localStorage.getItem("salaId");
         if (salaId) {
