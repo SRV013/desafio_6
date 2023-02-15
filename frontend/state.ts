@@ -135,17 +135,13 @@ const state = {
         }
     },
      pase(){
-    const salaRtdbId = localStorage.getItem("salaRtdbId");
-    if (salaRtdbId) {
-        fetch(API_BASE_URL + "/pase/" + salaRtdbId, {
-            method: "pathc",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify(salaRtdbId),
-        })
-            .then((res) => {
-                return res.json();
+        const salaRtdbId = localStorage.getItem("salaRtdbId");
+        if (salaRtdbId) {
+            fetch(API_BASE_URL + "/pase/" + salaRtdbId, {
+                method: "post",
+                headers: { "content-type": "application/json" },
             })
-        } 
+        }
  },
     manos(cb?) {
         const salaId = localStorage.getItem("salaId");
