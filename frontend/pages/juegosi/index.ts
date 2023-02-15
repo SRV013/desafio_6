@@ -93,13 +93,11 @@ export class JugadaInvitado extends HTMLElement {
                 tipotijera.classList.add("tipo-bloqueado");
                 tipopiedra.classList.add("tipo-bloqueado");
             }
-            //  TIMER Q DISPARA A RESULTADO
+      //  TIMER Q DISPARA A RESULTADO
             const timeInvidado = setInterval(() => {
                 const ganador = localStorage.getItem("ganador");
-                console.log(ganador);
-                if (ganador =='OK'){
-
-                    state.valJugadas((e) => {
+                state.valJugadas((e) => {
+                        if (e.pase ==true){
                         if (e.tu_juego != "ninguna" && e.su_juego != "ninguna"){
                             if (e.tu_juego == "tijera") {
                                 tipotijeraTop.classList.add("tipo-top-activos");
@@ -113,8 +111,8 @@ export class JugadaInvitado extends HTMLElement {
                             Router.go("/resultados_invitado");
                             clearInterval(timeInvidado);
                         }
+                    }
                     });
-                }
             }, 1000);
         }
     }
