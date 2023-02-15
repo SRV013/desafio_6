@@ -96,7 +96,8 @@ export class JugadaInvitado extends HTMLElement {
             //  TIMER Q DISPARA A RESULTADO
             const timeInvidado = setInterval(() => {
                 state.valJugadas((e) => {
-                    if (e.tu_juego != "ninguna" && e.su_juego != "ninguna"){
+                    const ganador = localStorage.getItem("ganador");
+                    if (e.tu_juego != "ninguna" && e.su_juego != "ninguna" && ganador =='OK'){
                         if (e.tu_juego == "tijera") {
                             tipotijeraTop.classList.add("tipo-top-activos");
                         }
