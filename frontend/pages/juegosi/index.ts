@@ -95,24 +95,25 @@ export class JugadaInvitado extends HTMLElement {
             }
             //  TIMER Q DISPARA A RESULTADO
             const timeInvidado = setInterval(() => {
-                state.valJugadas((e) => {
-                    const ganador = localStorage.getItem("ganador");
-                    if (e.tu_juego != "ninguna" && e.su_juego != "ninguna" && ganador =='OK'){
-                        if (e.tu_juego == "tijera") {
-                            tipotijeraTop.classList.add("tipo-top-activos");
-                        }
-                        if (e.tu_juego == "piedra") {
-                            tipopiedraTop.classList.add("tipo-top-activos");
-                        }
-                        if (e.tu_juego == "papel") {
-                            tipopapelTop.classList.add("tipo-top-activos");
-                        }
-                        setTimeout(() => {
+                const ganador = localStorage.getItem("ganador");
+                if (ganador =='OK'){
+
+                    state.valJugadas((e) => {
+                        if (e.tu_juego != "ninguna" && e.su_juego != "ninguna"){
+                            if (e.tu_juego == "tijera") {
+                                tipotijeraTop.classList.add("tipo-top-activos");
+                            }
+                            if (e.tu_juego == "piedra") {
+                                tipopiedraTop.classList.add("tipo-top-activos");
+                            }
+                            if (e.tu_juego == "papel") {
+                                tipopapelTop.classList.add("tipo-top-activos");
+                            }
                             Router.go("/resultados_invitado");
-                          }, 2000);
-                        clearInterval(timeInvidado);
-                    }
-                });
+                            clearInterval(timeInvidado);
+                        }
+                    });
+                }
             }, 1000);
         }
     }
