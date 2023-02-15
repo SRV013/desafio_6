@@ -132,6 +132,8 @@ app.post("/jugada/", (req, res) => {
 // GUARDAR RESULTADO DB FINAL ID SALA
 app.post("/guardajuego", (req, res) => {
     const data = req.body;
+    console.log(data);
+
     salasColeccion
         .doc(data.salaId.toString())
         .get()
@@ -182,16 +184,20 @@ app.post("/guardajuego", (req, res) => {
                         su_juego: data.su_juego,
                     })
                     .then(() => {
-                        res.json("OK");
+                        res.json(true);
+                        const mano = {
+                            tu_juego: data.tu_juego,
+                            su_juego: data.su_juego,
+                        };
+                        firestore
+                            .collection("salas/" + data.salaId + "/jugadas")
+                            .doc()
+                            .set(mano);
+                        const salaRef = rtdb.ref("salas/" + data.salaRtdbId);
+                        salaRef.update({
+                            pase: true,
+                        });
                     });
-                const mano = {
-                    tu_juego: data.tu_juego,
-                    su_juego: data.su_juego,
-                };
-                firestore
-                    .collection("salas/" + data.salaId + "/jugadas")
-                    .doc()
-                    .set(mano);
             }
         });
 });
@@ -229,6 +235,20 @@ app.get("/tipojugada/:id", (req, res) => {
     sala.once("value", (e) => {
         res.json(e.val());
     });
+});
+// PASE JUGADA
+app.patch("/pase/:id", (req, res) => {
+    const salaRtdbId = req.params.id;
+    const salaRef = rtdb.ref("salas/" + salaRtdbId);
+        salaRef
+            .update({
+                pase: false,
+            })
+            .then(() => {
+                res.json({
+                    mensaje: "bloqueo pase",
+                });
+            });
 });
 const relativeRoute = path.resolve(__dirname, "../../dist");
 app.use(express.static(relativeRoute));
