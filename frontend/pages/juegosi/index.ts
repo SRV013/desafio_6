@@ -96,6 +96,7 @@ export class JugadaInvitado extends HTMLElement {
             //  TIMER Q DISPARA A RESULTADO
             const timeInvidado = setInterval(() => {
                 const ganador = localStorage.getItem("ganador");
+                console.log(ganador);
                 if (ganador =='OK'){
 
                     state.valJugadas((e) => {
