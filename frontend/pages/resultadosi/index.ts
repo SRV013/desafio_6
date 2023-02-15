@@ -5,6 +5,7 @@ export class ResultadoInvitado extends HTMLElement {
         this.render();
     }
     render() {
+        localStorage.removeItem("ganador");
         this.innerHTML = `
     <div class="container">
         <div class="tablero">
