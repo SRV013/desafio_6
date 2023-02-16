@@ -93,7 +93,7 @@ export class JugadaInvitado extends HTMLElement {
                 tipotijera.classList.add("tipo-bloqueado");
                 tipopiedra.classList.add("tipo-bloqueado");
             }
-      //  TIMER Q DISPARA A RESULTADO
+            //  TIMER Q DISPARA A RESULTADO
             const timeInvidado = setInterval(() => {
                 const ganador = localStorage.getItem("ganador");
                 state.valJugadas((e) => {

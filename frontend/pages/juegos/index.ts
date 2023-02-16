@@ -96,7 +96,7 @@ export class Juegos extends HTMLElement {
             // TIMER Q DISPARA A RESULTADO
             const timeCreador = setInterval(() => {
                 state.valJugadas((e) => {
-                    if (e.tu_juego != "ninguna" && e.su_juego != "ninguna"){
+                    if (e.tu_juego != "ninguna" && e.su_juego != "ninguna") {
                         if (e.su_juego == "tijera") {
                             tipotijeraTop.classList.add("tipo-top-activos");
                         }
@@ -107,12 +107,10 @@ export class Juegos extends HTMLElement {
                             tipopapelTop.classList.add("tipo-top-activos");
                         }
                         state.guardaresultado(e, (resultado) => {
-                            if (resultado) {         
-                                
+                            if (resultado) {
                                 setTimeout(() => {
                                     Router.go("/resultados");
-                                  }, 1000);
-                                  
+                                }, 1000);
                             }
                         });
                         clearInterval(timeCreador);
