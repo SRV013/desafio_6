@@ -56,6 +56,7 @@ app.post("/salas", (req, res) => {
                         sala_disponible: true,
                         tu_id: participanteId,
                         tu_nombre: nombre,
+                        pase: false,
                     })
                     .then(() => {
                         const salaRtdbId = salaRef.key;
@@ -132,15 +133,16 @@ app.post("/jugada/", (req, res) => {
 // GUARDAR RESULTADO DB FINAL ID SALA
 app.post("/guardajuego", (req, res) => {
     const data = req.body;
-    console.log(data);
-
     salasColeccion
         .doc(data.salaId.toString())
         .get()
         .then((e) => {
-            var empates = e.data().empates || 0;
-            var derrotas = e.data().derrotas || 0;
-            var victorias = e.data().victorias || 0;
+            return e.data();
+        })
+        .then((r) => {
+            var empates = r.empates || 0;
+            var derrotas = r.derrotas || 0;
+            var victorias = r.victorias || 0;
             const empate = [
                 data.tu_juego == "tijera" && data.su_juego == "tijera",
                 data.tu_juego == "piedra" && data.su_juego == "piedra",
@@ -169,36 +171,37 @@ app.post("/guardajuego", (req, res) => {
                     var ganador = "invitado";
                 }
             }
+
             if (ganador) {
-                salasColeccion
-                    .doc(data.salaId.toString())
-                    .update({
-                        su_nombre: data.su_nombre,
-                        tu_nombre: data.tu_nombre,
-                        su_id: data.su_id,
-                        victorias,
-                        derrotas,
-                        empates,
-                        ganador,
-                        tu_juego: data.tu_juego,
-                        su_juego: data.su_juego,
-                    })
-                    .then(() => {
-                        res.json(true);
-                        const mano = {
-                            tu_juego: data.tu_juego,
-                            su_juego: data.su_juego,
-                        };
-                        firestore
-                            .collection("salas/" + data.salaId + "/jugadas")
-                            .doc()
-                            .set(mano);
-                        const salaRef = rtdb.ref("salas/" + data.salaRtdbId);
-                        salaRef.update({
-                            pase: true,
-                        });
-                    });
+                salasColeccion.doc(data.salaId.toString()).update({
+                    su_nombre: data.su_nombre,
+                    tu_nombre: data.tu_nombre,
+                    su_id: data.su_id,
+                    victorias,
+                    derrotas,
+                    empates,
+                    ganador,
+                    tu_juego: data.tu_juego,
+                    su_juego: data.su_juego,
+                });
             }
+            const mano = {
+                tu_juego: r.tu_juego,
+                su_juego: r.su_juego,
+            };
+            firestore
+                .collection("salas/" + data.salaId + "/jugadas")
+                .doc()
+                .set(mano)
+                    const salaRef = rtdb.ref("salas/" + r.salaRtdbId);
+                    salaRef
+                        .update({
+                            pase: true,
+                        })
+            return r
+        })
+        .then((p) => {
+            res.json(p);
         });
 });
 //LISTA COMPLETA DE MANOS EN SALAS
@@ -237,18 +240,18 @@ app.get("/tipojugada/:id", (req, res) => {
     });
 });
 // PASE JUGADA
-app.patch("/pase/:id", (req, res) => {
+app.post("/pase/:id", (req, res) => {
     const salaRtdbId = req.params.id;
     const salaRef = rtdb.ref("salas/" + salaRtdbId);
-        salaRef
-            .update({
-                pase: false,
-            })
-            .then(() => {
-                res.json({
-                    mensaje: "bloqueo pase",
-                });
+    salaRef
+        .update({
+            pase: false,
+        })
+        .then(() => {
+            res.json({
+                mensaje: "bloqueo pase",
             });
+        });
 });
 const relativeRoute = path.resolve(__dirname, "../../dist");
 app.use(express.static(relativeRoute));
