@@ -112,8 +112,12 @@ const state = {
                 method: "post",
                 headers: { "content-type": "application/json" },
                 body: JSON.stringify(data),
-            }).then((res) => {
-                cb(res);
+            })
+            .then((res) => {
+                return res.json();
+            })
+            .then((e) => {
+                cb(e);
             });
         }
     },
@@ -139,7 +143,7 @@ const state = {
             fetch(API_BASE_URL + "/pase/" + salaRtdbId, {
                 method: "post",
                 headers: { "content-type": "application/json" },
-            })
+            });
         }
     },
 
