@@ -139,7 +139,7 @@ app.post("/guardajuego", (req, res) => {
         .then((e) => {
             return e.data();
         })
-        .then((r) => {
+        .then(async (r) => {
             var empates = r.empates || 0;
             var derrotas = r.derrotas || 0;
             var victorias = r.victorias || 0;
@@ -189,16 +189,16 @@ app.post("/guardajuego", (req, res) => {
                 tu_juego: r.tu_juego,
                 su_juego: r.su_juego,
             };
-            firestore
+
+            await firestore
                 .collection("salas/" + data.salaId + "/jugadas")
                 .doc()
-                .set(mano)
-                    const salaRef = rtdb.ref("salas/" + r.salaRtdbId);
-                    salaRef
-                        .update({
-                            pase: true,
-                        })
-            return r
+                .set(mano);
+            const salaRef = rtdb.ref("salas/" + r.salaRtdbId);
+            await salaRef.update({
+                pase: true,
+            });
+            return r;
         })
         .then((p) => {
             res.json(p);
