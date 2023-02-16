@@ -1,6 +1,5 @@
-require('dotenv').config()  
+require("dotenv").config();
 const API_BASE_URL = process.env.API_HOST;
-
 const state = {
     // NEVO PARTICIANTES
     nuevoParticipante(nombre, cb?) {
@@ -112,7 +111,7 @@ const state = {
             fetch(API_BASE_URL + "/guardajuego", {
                 method: "post",
                 headers: { "content-type": "application/json" },
-                body: JSON.stringify({...data , salaRtdbId}),
+                body: JSON.stringify(data),
             }).then((res) => {
                 cb(res);
             });
@@ -134,7 +133,7 @@ const state = {
                 });
         }
     },
-     pase(){
+    pase() {
         const salaRtdbId = localStorage.getItem("salaRtdbId");
         if (salaRtdbId) {
             fetch(API_BASE_URL + "/pase/" + salaRtdbId, {
@@ -142,7 +141,8 @@ const state = {
                 headers: { "content-type": "application/json" },
             })
         }
- },
+    },
+
     manos(cb?) {
         const salaId = localStorage.getItem("salaId");
         if (salaId) {
