@@ -90,6 +90,24 @@ const state = {
                 });
         }
     },
+// nuev
+guardarRetul(cb?){
+    const salaRtdbId = localStorage.getItem("salaRtdbId");
+    if (salaRtdbId) {
+        fetch(API_BASE_URL + "/tipojugada/" + salaRtdbId, {
+            method: "get",
+            headers: { "content-type": "application/json" },
+        })
+            .then((res) => {
+                return res.json();
+            })
+            .then((e) => {
+                cb(e);
+            });
+    }
+
+},
+
     // JUGADA QUIEN Y QUE
     jugada(quien, jugada) {
         const salaRtdbId = localStorage.getItem("salaRtdbId");
@@ -106,9 +124,9 @@ const state = {
         }
     },
     // GUARDA RESULTAFDOS
-    guardaresultado(data, cb?) {
+  async  guardaresultado(data, cb?) {
         if (data) {
-            fetch(API_BASE_URL + "/guardajuego", {
+       await     fetch(API_BASE_URL + "/guardajuego", {
                 method: "post",
                 headers: { "content-type": "application/json" },
                 body: JSON.stringify(data),

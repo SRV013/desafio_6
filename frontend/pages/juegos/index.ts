@@ -105,11 +105,11 @@ export class Juegos extends HTMLElement {
                         }
                         if (e.su_juego == "papel") {
                             tipopapelTop.classList.add("tipo-top-activos");
-                        }                        
-                        state.guardaresultado(e, (resultado) => {
-                            if (resultado) {
+                        }
+                        state.guardaresultado(e, (r) => {
+                            if (r) {
                                 setTimeout(() => {
-                                       Router.go("/resultados");
+                                    Router.go("/resultados");
                                 }, 1000);
                             }
                         });

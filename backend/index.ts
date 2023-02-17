@@ -131,16 +131,13 @@ app.post("/jugada/", (req, res) => {
     }
 });
 // GUARDAR RESULTADO DB FINAL ID SALA
-app.post("/guardajuego", async (req, res) => {
+app.post("/guardajuego", (req, res) => {
     const data = req.body;
-    await salasColeccion
+    salasColeccion
         .doc(data.salaId.toString())
         .get()
         .then((e) => {
-            return e.data();
-        })
-        .then(async (r) => {
-            console.log("busca los datos");
+            const r = e.data();
             var empates = r.empates || 0;
             var derrotas = r.derrotas || 0;
             var victorias = r.victorias || 0;
@@ -172,8 +169,13 @@ app.post("/guardajuego", async (req, res) => {
                     var ganador = "invitado";
                 }
             }
-            if (ganador) {
-                await salasColeccion
+                console.log(
+                    data.su_nombre,
+                    data.tu_nombre,
+                    data.tu_juego,
+                    data.su_juego
+                );
+                salasColeccion
                     .doc(data.salaId.toString())
                     .update({
                         su_nombre: data.su_nombre,
@@ -186,30 +188,49 @@ app.post("/guardajuego", async (req, res) => {
                         tu_juego: data.tu_juego,
                         su_juego: data.su_juego,
                     })
-                    .then( async (e)  => {
-                        console.log("grabo partida");
+                    .then(() => {
                         const mano = {
-                                tu_juego: r.tu_juego,
-                                su_juego: r.su_juego,
-                            };
-                            await firestore
+                            tu_juego: data.tu_juego,
+                            su_juego: data.su_juego,
+                        };
+                        firestore
                             .collection("salas/" + data.salaId + "/jugadas")
                             .doc()
-                            .set(mano).then(async (y) => {
-                                console.log('guarda las partidas');
-                                const salaRef = rtdb.ref("salas/" + r.salaRtdbId);
-                                await salaRef.update({
+                            .set(mano)
+                            .then(() => {
+                                const salaRef = rtdb.ref(
+                                    "salas/" + r.salaRtdbId
+                                );
+
+                                salaRef
+                                    .update({
                                         pase: true,
-                                    }).then(async(m)=>{
-                                        console.log('finaliza');
                                     })
+                                    .then(() => {
+                                        console.log("PASE -> OK");
+                                    })
+                                    .catch((error) => {
+                                        console.error("Error PASE: ", error);
+                                    });
+
+                                console.log("GUARAR JUGADAS -> OK");
                             })
-                            })
-                }
-                            return r;
+                            .catch((error) => {
+                                console.error("Error JUGADAS: ", error);
+                            });
+                        console.log("LEER DATA -> OK");
+                    })
+                    .catch((error) => {
+                        console.error("Error LEER DATA: ", error);
+                    });
+            return e.data();
         })
         .then((p) => {
+            console.log("INICIO -> OK");
             res.json(p);
+        })
+        .catch((error) => {
+            console.error("Error INICIO: ", error);
         });
 });
 //LISTA COMPLETA DE MANOS EN SALAS
