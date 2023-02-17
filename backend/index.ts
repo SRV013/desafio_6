@@ -136,103 +136,121 @@ app.post("/guardajuego", (req, res) => {
     salasColeccion
         .doc(data.salaId.toString())
         .get()
-        .then((e) => {
+        .then(async (e) => {
             const r = e.data();
-            var empates = r.empates || 0;
-            var derrotas = r.derrotas || 0;
-            var victorias = r.victorias || 0;
-            const empate = [
-                data.tu_juego == "tijera" && data.su_juego == "tijera",
-                data.tu_juego == "piedra" && data.su_juego == "piedra",
-                data.tu_juego == "papel" && data.su_juego == "papel",
-            ];
-            if (empate.includes(true)) {
-                empates++;
-                var ganador = "empates";
-            }
-            const juego = [
-                data.tu_juego == "tijera" && data.su_juego == "papel",
-                data.tu_juego == "piedra" && data.su_juego == "tijera",
-                data.tu_juego == "papel" && data.su_juego == "piedra",
-            ];
-            if (juego.includes(true)) {
-                victorias++;
-                var ganador = "anfitrion";
-            } else {
-                const juego = [
-                    data.su_juego == "tijera" && data.tu_juego == "papel",
-                    data.su_juego == "piedra" && data.tu_juego == "tijera",
-                    data.su_juego == "papel" && data.tu_juego == "piedra",
-                ];
-                if (juego.includes(true)) {
-                    derrotas++;
-                    var ganador = "invitado";
-                }
-            }
-                console.log(
-                    data.su_nombre,
-                    data.tu_nombre,
-                    data.tu_juego,
-                    data.su_juego
-                );
-                salasColeccion
-                    .doc(data.salaId.toString())
-                    .update({
-                        su_nombre: data.su_nombre,
-                        tu_nombre: data.tu_nombre,
-                        su_id: data.su_id,
-                        victorias,
-                        derrotas,
-                        empates,
-                        ganador,
-                        tu_juego: data.tu_juego,
-                        su_juego: data.su_juego,
-                    })
-                    .then(() => {
-                        const mano = {
-                            tu_juego: data.tu_juego,
-                            su_juego: data.su_juego,
-                        };
-                        firestore
-                            .collection("salas/" + data.salaId + "/jugadas")
-                            .doc()
-                            .set(mano)
-                            .then(() => {
-                                const salaRef = rtdb.ref(
-                                    "salas/" + r.salaRtdbId
-                                );
-
-                                salaRef
-                                    .update({
-                                        pase: true,
-                                    })
-                                    .then(() => {
-                                        console.log("PASE -> OK");
-                                    })
-                                    .catch((error) => {
-                                        console.error("Error PASE: ", error);
-                                    });
-
-                                console.log("GUARAR JUGADAS -> OK");
-                            })
-                            .catch((error) => {
-                                console.error("Error JUGADAS: ", error);
-                            });
-                        console.log("LEER DATA -> OK");
-                    })
-                    .catch((error) => {
-                        console.error("Error LEER DATA: ", error);
-                    });
-            return e.data();
-        })
-        .then((p) => {
-            console.log("INICIO -> OK");
-            res.json(p);
+            const dataGanador = {
+                empates: r.empates,
+                victorias: r.victorias,
+                derrotas: r.derrotas,
+                tu_juego: data.tu_juego,
+                su_juego: data.su_juego,
+            };
+            const ganadador = await obtenerganador(dataGanador);
+            const guadarData = await guardar({ ...ganadador, ...data });
+            const guadarMano = await guardamano({
+                salaId: data.salaId,
+                tu_juego: data.tu_juego,
+                su_juego: data.su_juego,
+            });
+            const cambiarpase = await pases(guadarData.salaRtdbId);      
+            res.json(guadarData)
         })
         .catch((error) => {
             console.error("Error INICIO: ", error);
         });
 });
+
+function obtenerganador(data) {
+    const r = data;
+    var empates = r.empates || 0;
+    var derrotas = r.derrotas || 0;
+    var victorias = r.victorias || 0;
+    const empate = [
+        data.tu_juego == "tijera" && data.su_juego == "tijera",
+        data.tu_juego == "piedra" && data.su_juego == "piedra",
+        data.tu_juego == "papel" && data.su_juego == "papel",
+    ];
+    if (empate.includes(true)) {
+        empates++;
+        var ganador = "empates";
+    }
+    const juego = [
+        data.tu_juego == "tijera" && data.su_juego == "papel",
+        data.tu_juego == "piedra" && data.su_juego == "tijera",
+        data.tu_juego == "papel" && data.su_juego == "piedra",
+    ];
+    if (juego.includes(true)) {
+        victorias++;
+        var ganador = "anfitrion";
+    } else {
+        const juego = [
+            data.su_juego == "tijera" && data.tu_juego == "papel",
+            data.su_juego == "piedra" && data.tu_juego == "tijera",
+            data.su_juego == "papel" && data.tu_juego == "piedra",
+        ];
+        if (juego.includes(true)) {
+            derrotas++;
+            var ganador = "invitado";
+        }
+    }
+    return { ganador, empates, victorias, derrotas };
+}
+
+function guardar(data) {
+    salasColeccion
+        .doc(data.salaId.toString())
+        .update({
+            su_nombre: data.su_nombre,
+            tu_nombre: data.tu_nombre,
+            su_id: data.su_id,
+            victorias: data.victorias,
+            derrotas: data.derrotas,
+            empates: data.empates,
+            ganador: data.ganador,
+            tu_juego: data.tu_juego,
+            su_juego: data.su_juego,
+        })
+        .then(() => {
+            console.log("GUARDAR DATA -> OK");
+        })
+        .catch((error) => {
+            console.error("Error GUARDAR DATA: ", error);
+        });
+    return data;
+}
+function guardamano(data) {
+    const mano = {
+        tu_juego: data.tu_juego,
+        su_juego: data.su_juego,
+    };
+    firestore
+        .collection("salas/" + data.salaId + "/jugadas")
+        .doc()
+        .set(mano)
+        .then(() => {
+            console.log("GUARAR JUGADAS -> OK");
+        })
+        .catch((error) => {
+            console.error("Error JUGADAS: ", error);
+        });
+    return data;
+}
+
+function pases(data) {
+    const salaRef = rtdb.ref("salas/" + data);
+    salaRef
+        .update({
+            pase: true,
+        })
+        .then(() => {
+            console.log("PASE -> OK");
+        })
+        .catch((error) => {
+            console.error("Error PASE: ", error);
+        });
+        return data
+}
+
 //LISTA COMPLETA DE MANOS EN SALAS
 app.get("/manos/:salaId", (req, res) => {
     const salaId = req.params.salaId;
