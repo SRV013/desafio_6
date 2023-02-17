@@ -133,14 +133,14 @@ app.post("/jugada/", (req, res) => {
 // GUARDAR RESULTADO DB FINAL ID SALA
 app.post("/guardajuego", async (req, res) => {
     const data = req.body;
-   await salasColeccion
+    await salasColeccion
         .doc(data.salaId.toString())
         .get()
         .then((e) => {
             return e.data();
         })
         .then(async (r) => {
-            console.log('0');
+            console.log("busca los datos");
             var empates = r.empates || 0;
             var derrotas = r.derrotas || 0;
             var victorias = r.victorias || 0;
@@ -152,7 +152,7 @@ app.post("/guardajuego", async (req, res) => {
             if (empate.includes(true)) {
                 empates++;
                 var ganador = "empates";
-            } 
+            }
             const juego = [
                 data.tu_juego == "tijera" && data.su_juego == "papel",
                 data.tu_juego == "piedra" && data.su_juego == "tijera",
@@ -172,37 +172,41 @@ app.post("/guardajuego", async (req, res) => {
                     var ganador = "invitado";
                 }
             }
-
             if (ganador) {
-             await  salasColeccion.doc(data.salaId.toString()).update({
-                    su_nombre: data.su_nombre,
-                    tu_nombre: data.tu_nombre,
-                    su_id: data.su_id,
-                    victorias,
-                    derrotas,
-                    empates,
-                    ganador,
-                    tu_juego: data.tu_juego,
-                    su_juego: data.su_juego,
-                });
-                console.log('1');
-                
-            }
-            const mano = {
-                tu_juego: r.tu_juego,
-                su_juego: r.su_juego,
-            };
-            await firestore
-            .collection("salas/" + data.salaId + "/jugadas")
-            .doc()
-            .set(mano);
-            console.log('2');
-            const salaRef = rtdb.ref("salas/" + r.salaRtdbId);
-            await salaRef.update({
-                pase: true,
-            });
-            console.log('3');
-            return r;
+                await salasColeccion
+                    .doc(data.salaId.toString())
+                    .update({
+                        su_nombre: data.su_nombre,
+                        tu_nombre: data.tu_nombre,
+                        su_id: data.su_id,
+                        victorias,
+                        derrotas,
+                        empates,
+                        ganador,
+                        tu_juego: data.tu_juego,
+                        su_juego: data.su_juego,
+                    })
+                    .then( async (e)  => {
+                        console.log("grabo partida");
+                        const mano = {
+                                tu_juego: r.tu_juego,
+                                su_juego: r.su_juego,
+                            };
+                            await firestore
+                            .collection("salas/" + data.salaId + "/jugadas")
+                            .doc()
+                            .set(mano).then(async (y) => {
+                                console.log('guarda las partidas');
+                                const salaRef = rtdb.ref("salas/" + r.salaRtdbId);
+                                await salaRef.update({
+                                        pase: true,
+                                    }).then(async(m)=>{
+                                        console.log('finaliza');
+                                    })
+                            })
+                            })
+                }
+                            return r;
         })
         .then((p) => {
             res.json(p);
