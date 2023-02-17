@@ -107,7 +107,7 @@ export class JugadaInvitado extends HTMLElement {
                             if (e.tu_juego == "papel") {
                                 tipopapelTop.classList.add("tipo-top-activos");
                             }
-                            Router.go("/resultados_invitado");
+                      //      Router.go("/resultados_invitado");
                             clearInterval(timeInvidado);
                         }
                     }

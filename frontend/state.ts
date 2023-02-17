@@ -125,8 +125,8 @@ guardarRetul(cb?){
     },
     // GUARDA RESULTAFDOS
   async  guardaresultado(data, cb?) {
-        if (data) {
-       await     fetch(API_BASE_URL + "/guardajuego", {
+    if (data) {
+       await  fetch(API_BASE_URL + "/guardajuego", {
                 method: "post",
                 headers: { "content-type": "application/json" },
                 body: JSON.stringify(data),
@@ -155,6 +155,7 @@ guardarRetul(cb?){
                 });
         }
     },
+// PASE    
     pase() {
         const salaRtdbId = localStorage.getItem("salaRtdbId");
         if (salaRtdbId) {
@@ -164,7 +165,7 @@ guardarRetul(cb?){
             });
         }
     },
-
+// GUARDA MANO
     manos(cb?) {
         const salaId = localStorage.getItem("salaId");
         if (salaId) {

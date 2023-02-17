@@ -134,7 +134,9 @@ app.post("/jugada/", (req, res) => {
     }
 });
 // GUARDAR RESULTADO DB FINAL ID SALA
-app.post("/guardajuego",  (req, res) => {
+app.post("/guardajuego", async (req, res) => {
+    console.log('INICIO - OK');
+    
     const data = req.body;
     const dataGanador = {
         empates: data.empates,
@@ -143,18 +145,19 @@ app.post("/guardajuego",  (req, res) => {
         tu_juego: data.tu_juego,
         su_juego: data.su_juego,
     };
-    const ganadador =  obtenerganador(dataGanador);
-    const guadarData =  guardar({ ...data, ...ganadador });
-    const guadarMano =  guardamano({
-        salaId: data.salaId,
-        tu_juego: data.tu_juego,
-        su_juego: data.su_juego,
+    const ganadador = buscaGanador(dataGanador);
+    await guardar({ ...data, ...ganadador }).then(async () => {
+        await guardamano({
+            salaId: data.salaId,
+            tu_juego: data.tu_juego,
+            su_juego: data.su_juego,
+        });
     });
-    const cambiarpase =  pases(guadarData);
-    res.json(guadarData);
+    await pases({ ...data, ...ganadador });
+    res.json(data);
 });
-
-function obtenerganador(data) {
+function buscaGanador(data) {
+    console.log('1 /4 - OK');
     var empates = data.empates || 0;
     var derrotas = data.derrotas || 0;
     var victorias = data.victorias || 0;
@@ -189,29 +192,36 @@ function obtenerganador(data) {
     return { ganador, empates, victorias, derrotas };
 }
 
-function guardar(data) {
-    salasColeccion
-        .doc(data.salaId.toString())
-        .update({
-            su_nombre: data.su_nombre,
-            tu_nombre: data.tu_nombre,
-            su_id: data.su_id,
-            victorias: data.victorias,
-            derrotas: data.derrotas,
-            empates: data.empates,
-            ganador: data.ganador,
-            tu_juego: data.tu_juego,
-            su_juego: data.su_juego,
-        })
-        .then(() => {
-            console.log("PASO 1 / 3");
-        })
-        .catch((error) => {
-            console.error("Error PASO 1: ", error);
-        });
+async function guardar(data) {
+    console.log('2 /4 - OK');
+    salasColeccion.doc(data.salaId.toString()).update({
+        su_nombre: data.su_nombre,
+        tu_nombre: data.tu_nombre,
+        su_id: data.su_id,
+        victorias: data.victorias,
+        derrotas: data.derrotas,
+        ganador: data.ganador,
+        empates: data.empates,
+        tu_juego: data.tu_juego,
+        su_juego: data.su_juego,
+    });
     return data;
 }
-function guardamano(data) {
+
+async function pases(data) {
+    console.log('3 /4 - OK');
+    const salaRef = rtdb.ref("salas/" + data.salaRtdbId);
+    salaRef.update({
+        pase: true,
+        victorias: data.victorias,
+        derrotas: data.derrotas,
+        empates: data.empates,
+    });
+    return data;
+}
+
+async function guardamano(data) {
+    console.log('4 /4 - OK');
     const mano = {
         tu_juego: data.tu_juego,
         su_juego: data.su_juego,
@@ -219,34 +229,8 @@ function guardamano(data) {
     firestore
         .collection("salas/" + data.salaId + "/jugadas")
         .doc()
-        .set(mano)
-        .then(() => {
-            console.log("PASO 2 / 3");
-        })
-        .catch((error) => {
-            console.error("Error PASO 2: ", error);
-        });
-    return data;
+        .set(mano);
 }
-
-function pases(data) {
-    const salaRef = rtdb.ref("salas/" + data.salaRtdbId);
-    salaRef
-        .update({
-            pase: true,
-            victorias: data.victorias,
-            derrotas: data.derrotas,
-            empates: data.empates,
-        })
-        .then(() => {
-            console.log("PASO 3 / 3");
-        })
-        .catch((error) => {
-            console.error("Error PASO 3: ", error);
-        });
-    return data;
-}
-
 //LISTA COMPLETA DE MANOS EN SALAS
 app.get("/manos/:salaId", (req, res) => {
     const salaId = req.params.salaId;
@@ -279,7 +263,7 @@ app.get("/tipojugada/:id", (req, res) => {
     const salaRtdbId = req.params.id;
     const sala = rtdb.ref("salas/" + salaRtdbId);
     sala.once("value", (e) => {
-        res.json(e.val());
+        res.json({ ...e.val(), salaRtdbId });
     });
 });
 // PASE JUGADA
