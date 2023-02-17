@@ -97,6 +97,9 @@ app.post("/buscarsala", (req, res) => {
                     su_nombre: nombre,
                     su_id: idParticipante,
                     salaId,
+                    empates: 0,
+                    victorias: 0,
+                    derrotas: 0,
                 })
                 .then(() => {
                     res.json(salaRtdbId);
@@ -131,40 +134,30 @@ app.post("/jugada/", (req, res) => {
     }
 });
 // GUARDAR RESULTADO DB FINAL ID SALA
-app.post("/guardajuego", (req, res) => {
+app.post("/guardajuego",  (req, res) => {
     const data = req.body;
-    salasColeccion
-        .doc(data.salaId.toString())
-        .get()
-        .then(async (e) => {
-            const r = e.data();
-            const dataGanador = {
-                empates: r.empates,
-                victorias: r.victorias,
-                derrotas: r.derrotas,
-                tu_juego: data.tu_juego,
-                su_juego: data.su_juego,
-            };
-            const ganadador = await obtenerganador(dataGanador);
-            const guadarData = await guardar({ ...ganadador, ...data });
-            const guadarMano = await guardamano({
-                salaId: data.salaId,
-                tu_juego: data.tu_juego,
-                su_juego: data.su_juego,
-            });
-            const cambiarpase = await pases(guadarData.salaRtdbId);      
-            res.json(guadarData)
-        })
-        .catch((error) => {
-            console.error("Error INICIO: ", error);
-        });
+    const dataGanador = {
+        empates: data.empates,
+        victorias: data.victorias,
+        derrotas: data.derrotas,
+        tu_juego: data.tu_juego,
+        su_juego: data.su_juego,
+    };
+    const ganadador =  obtenerganador(dataGanador);
+    const guadarData =  guardar({ ...data, ...ganadador });
+    const guadarMano =  guardamano({
+        salaId: data.salaId,
+        tu_juego: data.tu_juego,
+        su_juego: data.su_juego,
+    });
+    const cambiarpase =  pases(guadarData);
+    res.json(guadarData);
 });
 
 function obtenerganador(data) {
-    const r = data;
-    var empates = r.empates || 0;
-    var derrotas = r.derrotas || 0;
-    var victorias = r.victorias || 0;
+    var empates = data.empates || 0;
+    var derrotas = data.derrotas || 0;
+    var victorias = data.victorias || 0;
     const empate = [
         data.tu_juego == "tijera" && data.su_juego == "tijera",
         data.tu_juego == "piedra" && data.su_juego == "piedra",
@@ -211,10 +204,10 @@ function guardar(data) {
             su_juego: data.su_juego,
         })
         .then(() => {
-            console.log("GUARDAR DATA -> OK");
+            console.log("PASO 1 / 3");
         })
         .catch((error) => {
-            console.error("Error GUARDAR DATA: ", error);
+            console.error("Error PASO 1: ", error);
         });
     return data;
 }
@@ -228,27 +221,30 @@ function guardamano(data) {
         .doc()
         .set(mano)
         .then(() => {
-            console.log("GUARAR JUGADAS -> OK");
+            console.log("PASO 2 / 3");
         })
         .catch((error) => {
-            console.error("Error JUGADAS: ", error);
+            console.error("Error PASO 2: ", error);
         });
     return data;
 }
 
 function pases(data) {
-    const salaRef = rtdb.ref("salas/" + data);
+    const salaRef = rtdb.ref("salas/" + data.salaRtdbId);
     salaRef
         .update({
             pase: true,
+            victorias: data.victorias,
+            derrotas: data.derrotas,
+            empates: data.empates,
         })
         .then(() => {
-            console.log("PASE -> OK");
+            console.log("PASO 3 / 3");
         })
         .catch((error) => {
-            console.error("Error PASE: ", error);
+            console.error("Error PASO 3: ", error);
         });
-        return data
+    return data;
 }
 
 //LISTA COMPLETA DE MANOS EN SALAS
